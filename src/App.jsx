@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router";
 // import Greet from './components/Greet/Greet';
 // import Counter from './components/Counter/Counter';
 //import Book from "./components/Book/Book";
@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 //import BookForm from "./components/BookForm/BookForm";
 import BookDetails from "./components/BookDetails/BookDetails";
 import Home from "./page/Home";
+import BookForm from "./components/BookForm/BookForm";
 // import { Suspense } from 'react';
 //import { Loading } from './components/Book/Book';
 
@@ -40,6 +41,7 @@ function App() {
             element={<Home bookList={bookList} filled={filled}/>}
           />
           <Route path="/book/:isbn" element={<BookDetails books={bookList} />} />
+          <Route path="/new" element={<BookForm updateBooKList={setBookList} />} />
         </Routes>
       </div>
     </BrowserRouter>

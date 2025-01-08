@@ -1,26 +1,16 @@
-import { useState } from "react";
+//import { useState } from "react";
 import CustomInput from "../CustomInput/CustomInput";
+import { Button } from "../ui/button";
+import { useForm } from "react-hook-form";
 
 const BookForm = ({updateBooKList}) => {
 
-    const [error, setError] = useState({errorStatus: false, errorMessage: ""});
-
-    const [formData, setFormData] = useState({
-        name: '',
-        numberOfPages: 0,
-        author: '',
-        isbn: ''
-    })
-
-    const handleChangeInput = (e) => {
-        
-        const { name, value } = e.target;
-        
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }))
-    }
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+    } = useForm();
     
     const isValidISBN = (isbn) => {
         const isbnWithoutDashes = isbn.replaceAll('-', '');
@@ -28,71 +18,48 @@ const BookForm = ({updateBooKList}) => {
         return false
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const onSubmit = (data) => {
 
-        const numberOfPagesInt = parseInt(formData.numberOfPages);
-
-        if(formData.name.length === 0) {
-            setError({
-                errorStatus: true,
-                errorMessage: "Name is required.",
-            });
-            return;
-        }
-        
-        if(numberOfPagesInt <= 0) {
-            setError({
-                errorStatus: true,
-                errorMessage: "Number of pages must be a positive number.",
-            });
-            return;
-        }
-        
-        if(formData.author.length === 0) {
-            setError({
-                errorStatus: true,
-                errorMessage: "Author is required.",
-            });
-            return;
-        }
+        const numberOfPagesInt = parseInt(data.numberOfPages);
 
         const newEntry = {
-            Authors: [formData.author],
+            Authors: [data.author],
             numberOfPages: numberOfPagesInt,
-            name: formData.name,
-            isbn: formData.isbn
+            name: data.name,
+            isbn: data.isbn
         }
 
         updateBooKList(prev => ([
             ...prev,
             newEntry
         ]))
-        
-        setFormData({
-            name: "",
-            numberOfPages: "",
-            author: "",
-            isbn: ""
-        });
 
-        setError({
-            errorStatus: false,
-            errorMessage: ""
-        })
+        reset();
 
-        console.log('formdata', formData);
+        //console.log('formdata', data);
     }
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6 space-y-4">
             <h2 className="text-lg font-semibold text-gray-800">Add a New Book</h2>
-            {error.errorStatus && <p className="text-xs text-red-500">{error.errorMessage}</p>}
-            <CustomInput type="text" name="name" value={formData.name} onChange={handleChangeInput} />
-            <CustomInput type="number" name="numberOfPages" value={formData.numberOfPages} onChange={handleChangeInput} />
-            <CustomInput type="text" name="author" value={formData.author} onChange={handleChangeInput} />
-            <CustomInput type="text" name="isbn" value={formData.isbn} onChange={handleChangeInput} validate={isValidISBN} errorMessage="ISBN format is not valid"/>
-            <button type="submit" className="w-full bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">Add new book</button>
+            <CustomInput type="text" name="name" errorMessage={errors.name?.message}
+                {...register("name", { required: "Name is required." })} />
+            <CustomInput type="number" name="numberOfPages" errorMessage={errors.numberOfPages?.message}
+                {...register("numberOfPages", {
+                    required: "Number of pages is required.",
+                    validate: (value) =>
+                        value > 0 || "Number of pages must be greater than 0.",
+                })} />
+            <CustomInput type="text" name="author" errorMessage={errors.author?.message} {...register("author", { required: "Author is required." })} />
+            <CustomInput type="text" name="isbn" errorMessage={errors.isbn?.message}
+                {...register("isbn", {
+                    required: "ISBN is required.",
+                    validate: (value) =>
+                        isValidISBN(value) || "ISBN format is not valid.",
+                })}/>
+            <Button type="submit" className="w-full">
+                Add New Book
+            </Button>
         </form>
     )
 }

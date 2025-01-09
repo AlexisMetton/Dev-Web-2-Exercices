@@ -8,7 +8,7 @@ const ThemeSwitcher = () => {
     return (
         <div style={{background: theme === 'light'}}>
             <p>Theme actuel : {theme}</p>
-            <Button onClick={toggleTheme} variant="outline" className="mt-4 mb-4">
+            <Button onClick={toggleTheme} variant="outline" className={`mt-4 mb-4 text-black`}>
             Changer theme
             </Button>
         </div>
